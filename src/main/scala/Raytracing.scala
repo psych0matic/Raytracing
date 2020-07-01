@@ -1,7 +1,5 @@
 import java.io.{File, FileWriter}
 
-import Raytracing.out
-
 object Raytracing extends App{
 
   val aspect = 16.0 / 9.0
@@ -15,10 +13,10 @@ object Raytracing extends App{
   val vpWidth = aspect * vpHeight
   val focalLength = 1.0
 
-  val origin = Vec3(0,0,0)
-  val horizontal = Vec3(vpWidth,0,0)
-  val vertical = Vec3(0,vpHeight,0)
-  val lowerLeft = origin - horizontal/2 - vertical/2 - Vec3(0,0,focalLength)
+  val origin = new Vec3(0,0,0)
+  val horizontal = new Vec3(vpWidth,0,0)
+  val vertical = new Vec3(0,vpHeight,0)
+  val lowerLeft = origin - horizontal/2 - vertical/2 - new Vec3(0,0,focalLength)
 
   for (j <- iHeight-1 to 0 by -1) {
     println("\rScanlines remaining: " + j)
@@ -34,15 +32,33 @@ object Raytracing extends App{
   println("\nDone\n")
 
   def rayColor(r:Ray): Vec3 = {
+    var t = hitSphere(new Vec3(0,0,-1),0.5,r)
+    if (t > 0.0) {
+      val N = new Vec3().unitVec(r.at(t) - new Vec3(0,0,-1))
+      return new Vec3(N.x+1,N.y+1,N.z+1)*0.5
+    }
     val unitDir = new Vec3().unitVec(r.direction)
-    val t = 0.5*(unitDir.y + 1.0)
-    Vec3(1.0,1.0,1.0)*(1.0-t)+Vec3(0.5,0.7,1.0)*t
+    t = 0.5*(unitDir.y + 1.0)
+    new Vec3(1.0,1.0,1.0)*(1.0-t) + new Vec3(0.5,0.7,1.0) * t
   }
 
   def writeColor(out: FileWriter,pixelColor:Vec3) = {
-    var r = (255.999 * pixelColor.x).asInstanceOf[Int]
-    var g = (255.999 * pixelColor.y).asInstanceOf[Int]
-    var b = (255.999 * pixelColor.z).asInstanceOf[Int]
+    val r = (255.999 * pixelColor.x).asInstanceOf[Int]
+    val g = (255.999 * pixelColor.y).asInstanceOf[Int]
+    val b = (255.999 * pixelColor.z).asInstanceOf[Int]
     out.write(f"$r%s $g%s $b%s\n")
+  }
+
+  def hitSphere(center:Vec3,radius:Double,r:Ray):Double = {
+    val oc = r.origin - center
+    val a = new Vec3().dot(r.direction,r.direction)
+    val b = 2.0 * new Vec3().dot(oc,r.direction)
+    val c = new Vec3().dot(oc,oc) - radius*radius
+    val disc = b*b - 4 *a *c
+    if (disc < 0) {
+      -1.0
+    } else {
+      (-b - Math.sqrt(disc)) / (2.0*a)
+    }
   }
 }
