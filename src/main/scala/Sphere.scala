@@ -1,4 +1,4 @@
-case class Sphere(center:Vec3,radius:Double) extends Hittable {
+case class Sphere(center:Vec3,radius:Double,mat:Material) extends Hittable {
   override def hit(r: Ray, tMin: Double, tMax: Double): Option[HitRecord] = {
     val oc = r.origin - center
     val a = r.direction.lengthSquared()
@@ -17,7 +17,8 @@ case class Sphere(center:Vec3,radius:Double) extends Hittable {
       Some(HitRecord(
         t = t,
         p = p,
-        normal = normal
+        normal = normal,
+        mat = mat
       ))
     } else {
       None

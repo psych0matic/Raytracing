@@ -1,3 +1,5 @@
+import scala.util.Random
+
 class Vec3(var x:Double, var y:Double, var z:Double) {
 
   def this() {
@@ -26,4 +28,17 @@ class Vec3(var x:Double, var y:Double, var z:Double) {
   def dot(u:Vec3,v:Vec3):Double =  u.x*v.x + u.y * v.y + u.z*v.z
   def cross(u:Vec3,v:Vec3):Vec3 =  new Vec3(u.y*v.z-u.z*v.y,u.z*v.x-u.x*v.z,u.x*v.y-u.y*v.x)
   def unitVec(v:Vec3) = this./(v,v.length())
+
+  def random(r:Random): Vec3 = {
+    new Vec3(r.nextDouble(),r.nextDouble(),r.nextDouble())
+  }
+
+  def random(r:Random,min:Double,max:Double) :Vec3 = {
+    new Vec3(randomDouble(r,min,max),randomDouble(r,min,max),randomDouble(r,min,max))
+  }
+
+  def randomDouble(r:Random,min:Double,max:Double): Double = {
+    min + (max-min)*r.nextDouble()
+  }
+
 }
